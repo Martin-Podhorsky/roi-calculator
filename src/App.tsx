@@ -39,8 +39,7 @@ function fmtMoney(n: number): string {
 }
 
 function fmtCount(n: number): string {
-  const r = Math.round(n * 10) / 10
-  return r % 1 === 0 ? Math.round(r).toString() : r.toFixed(1)
+  return Math.floor(n).toString()
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
