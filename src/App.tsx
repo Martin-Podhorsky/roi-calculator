@@ -214,22 +214,22 @@ function FunnelViz({ stages }: { stages: FunnelStage[] }) {
 const DEFAULTS: AppState = {
   setupFee: '3000',
   pricePerReply: '150',
-  responses: '100',
-  bookRate1: '80',
-  showupRate1: '80',
-  bookRate2: '100',
-  showupRate2: '70',
-  closeRate: '50',
+  responses: '',
+  bookRate1: '',
+  showupRate1: '',
+  bookRate2: '',
+  showupRate2: '',
+  closeRate: '',
   valueMode: 'single',
   premium: '',
-  commission: '15',
-  tenure: '3',
+  commission: '',
+  tenure: '',
   premiumMin: '',
   premiumMax: '',
-  commissionMin: '10',
-  commissionMax: '20',
-  tenureMin: '2',
-  tenureMax: '5',
+  commissionMin: '',
+  commissionMax: '',
+  tenureMin: '',
+  tenureMax: '',
 }
 
 export default function App() {
@@ -240,12 +240,12 @@ export default function App() {
   }
 
   // ─── Funnel math ───────────────────────────────────────────────────────────
-  const r = Math.max(0, parseNum(s.responses, 100))
-  const booked1 = r * (parseNum(s.bookRate1, 80) / 100)
-  const attended1 = booked1 * (parseNum(s.showupRate1, 80) / 100)
-  const booked2 = attended1 * (parseNum(s.bookRate2, 100) / 100)
-  const attended2 = booked2 * (parseNum(s.showupRate2, 70) / 100)
-  const customers = attended2 * (parseNum(s.closeRate, 50) / 100)
+  const r = Math.max(0, parseNum(s.responses, 0))
+  const booked1 = r * (parseNum(s.bookRate1, 0) / 100)
+  const attended1 = booked1 * (parseNum(s.showupRate1, 0) / 100)
+  const booked2 = attended1 * (parseNum(s.bookRate2, 0) / 100)
+  const attended2 = booked2 * (parseNum(s.showupRate2, 0) / 100)
+  const customers = attended2 * (parseNum(s.closeRate, 0) / 100)
 
   const repliesPerClient = customers > 0.001 ? r / customers : 0
   const cac = repliesPerClient * parseNum(s.pricePerReply, 150)
@@ -254,8 +254,9 @@ export default function App() {
   // ─── LTV math ──────────────────────────────────────────────────────────────
   const hasClientData =
     s.valueMode === 'single'
-      ? s.premium !== '' && parseNum(s.premium, 0) > 0
-      : s.premiumMin !== '' && s.premiumMax !== '' &&
+      ? s.premium !== '' && s.commission !== '' && s.tenure !== '' && parseNum(s.premium, 0) > 0
+      : s.premiumMin !== '' && s.premiumMax !== '' && s.commissionMin !== '' &&
+        s.commissionMax !== '' && s.tenureMin !== '' && s.tenureMax !== '' &&
         parseNum(s.premiumMin, 0) > 0 && parseNum(s.premiumMax, 0) > 0
 
   let ltvDisplay = '—'
@@ -301,7 +302,7 @@ export default function App() {
   const closingText = (() => {
     if (!hasResult) return 'Adjust the inputs on the left to see your ROI projection.'
     if (!hasClientData)
-      return `You get 1 new client for every ${fmtCount(repliesPerClient)} replies, at a cost of ${fmtMoney(cac)} per client. Enter client value details on the left to complete the ROI analysis.`
+      return `You get 1 new client for every ${fmtCount(repliesPerClient)} replies at a cost of ${fmtMoney(cac)} per client. Enter client value details on the left to see the full ROI statement.`
     return `You are paying ${fmtMoney(cac)} today to get ${ltvDisplay} within the next ${tenureDisplay}. Is that a deal that would make sense to make?`
   })()
 
@@ -413,7 +414,6 @@ export default function App() {
                     value={s.premium}
                     onChange={set('premium')}
                     prefix="$"
-                    placeholder="Ask prospect"
                   />
                   <InputField
                     label="Avg commission rate"
@@ -478,7 +478,7 @@ export default function App() {
                 />
                 <StatCard
                   label="Replies per New Client"
-                  value={repliesPerClient > 0 ? `1 per ${fmtCount(repliesPerClient)}` : '—'}
+                  value={repliesPerClient > 0 ? fmtCount(repliesPerClient) : '—'}
                 />
                 <StatCard
                   label="Cost per Client (CAC)"
