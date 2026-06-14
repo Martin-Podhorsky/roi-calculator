@@ -247,7 +247,7 @@ export default function App() {
   const attended2 = booked2 * (parseNum(s.showupRate2, 0) / 100)
   const customers = attended2 * (parseNum(s.closeRate, 0) / 100)
 
-  const repliesPerClient = customers > 0.001 ? r / customers : 0
+  const repliesPerClient = customers > 0.001 ? Math.floor(r / customers) : 0
   const cac = repliesPerClient * parseNum(s.pricePerReply, 150)
   const efficiency = r > 0 && customers > 0.001 ? (customers / r) * 100 : 0
 
